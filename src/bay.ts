@@ -45,7 +45,7 @@ export enum SortBy {
   QualityThenSeeders,
 }
 
-export interface Search {
+export interface SearchParameters {
   query: string;
   content: Content;
   providers: Provider[];
@@ -189,7 +189,7 @@ function sortTorrentFilesInfo(
   }
 }
 
-export class Bay {
+class Bay {
   private providers: Map<Provider, TorrentProvider>;
   private webtorrent: WebTorrent.Instance;
   private inflightSearches: Map<string, Promise<TorrentFileInfo | null>>;
@@ -209,9 +209,9 @@ export class Bay {
   }
 
   private selectProviders(
-    search: Search,
+    parameters: SearchParameters,
   ): { provider: TorrentProvider; formattedCategory: string }[] {
-    return search.providers
+    return parameters.providers
       .map((provider) => this.providers.get(provider))
       .filter((provider) => provider !== undefined)
       .map((provider) => {
@@ -280,17 +280,17 @@ export class Bay {
     }
   }
 
-  public async search(search: Search): Promise<Stream[]> {
-    if (search.providers.length === 0) return [];
+  public async search(parameters: SearchParameters): Promise<Stream[]> {
+    if (parameters.providers.length === 0) return [];
 
-    const desiredTorrent = buildTorrentMetaFilter(search.content);
+    const desiredTorrent = buildTorrentMetaFilter(parameters.content);
     const inspectedTorrents = new Set();
-    const searchesPerProvider = this.selectProviders(search).map(
+    const searchesPerProvider = this.selectProviders(parameters).map(
       async ({ provider, formattedCategory }) => {
         let torrentsMeta: TorrentMeta[];
         try {
           torrentsMeta = await provider.search(
-            search.query,
+            parameters.query,
             formattedCategory,
             this.options.searhLimitPerProvider,
           );
@@ -319,7 +319,7 @@ export class Bay {
             const torrentFileInfo = await this.lookupTorrent(
               magnetURI,
               infoHash,
-              search.content,
+              parameters.content,
               torrentMeta,
             );
             if (torrentFileInfo !== null) found.push(torrentFileInfo!);
@@ -331,7 +331,7 @@ export class Bay {
     );
     const torrentFilesInfo = await Promise.all(searchesPerProvider);
 
-    return sortTorrentFilesInfo(search.sortBy, torrentFilesInfo.flat());
+    return sortTorrentFilesInfo(parameters.sortBy, torrentFilesInfo.flat());
   }
 
   public destroy() {
@@ -339,6 +339,12 @@ export class Bay {
   }
 }
 
-export function createBay(options: Options): Bay {
+export interface TorrentBay {
+  search(parameters: SearchParameters): Promise<Stream[]>;
+
+  destroy(): void;
+}
+
+export function createTorrentBay(options: Options): TorrentBay {
   return new Bay(options);
 }

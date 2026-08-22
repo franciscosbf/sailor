@@ -1,9 +1,11 @@
-import { bay, addonInterface } from "./addon.js";
+import { buildAddonInterface } from "./addon.js";
 import { env } from "./flags.js";
 import { publishToCentral, landingTemplate } from "@stremio-addon/compat";
 import { getRouter } from "@stremio-addon/node-express";
 import express from "express";
 import { type AddressInfo } from "net";
+import { createTorrentBay } from "./bay.js";
+import { findMedia } from "./cinemata.js";
 
 if (env.ADDON_PUBLISH_URL !== undefined) {
   const url = `${env.ADDON_PUBLISH_URL}/manifest.json`;
@@ -15,6 +17,12 @@ if (env.ADDON_PUBLISH_URL !== undefined) {
       console.error(`Failed to publish addon: ${reason}`);
     });
 }
+
+const bay = createTorrentBay({
+  searhLimitPerProvider: env.BAY_SEARCH_LIMIT_PER_PROVIDER,
+  searchTimeout: env.BAY_SEARCH_TIMEOUT_MS,
+});
+const addonInterface = buildAddonInterface(findMedia, bay);
 
 const app = express();
 const port = env.ADDON_PORT;

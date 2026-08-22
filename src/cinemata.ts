@@ -13,7 +13,7 @@ export interface MediaMeta {
   date: string;
 }
 
-export async function findTitle(
+export async function findMedia(
   id: string,
   type: MediaType,
 ): Promise<MediaMeta | null> {
@@ -36,3 +36,8 @@ export async function findTitle(
 
   return meta;
 }
+
+export type CinemataMediaFinder = (
+  id: string,
+  type: MediaType,
+) => Promise<MediaMeta | null>;
