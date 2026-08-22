@@ -34,7 +34,7 @@ function streamHandler(
   const empty: { streams: StreamSchema[] } = { streams: [] };
 
   return async (args) => {
-    if (args.type === "channel" || args.type === "tv") return empty;
+    if (args.type !== "movie" && args.type !== "series") return empty;
 
     let providers = new Set(Object.keys(Provider) as Provider[]);
     let sortBy = SortBy.Seeders;
