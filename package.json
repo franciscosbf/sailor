@@ -1,0 +1,39 @@
+{
+  "name": "stremio-addon-sailor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/server.js",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf dist/",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/server.js"
+  },
+  "keywords": [
+    "stremio",
+    "addon"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@stremio-addon/compat": "^1.0.0",
+    "@stremio-addon/linter": "^1.0.0",
+    "@stremio-addon/node-express": "^1.0.0",
+    "@stremio-addon/sdk": "^1.0.0",
+    "@stremio-addon/zod": "^1.0.0",
+    "envalid": "^8.2.0",
+    "express": "^5.2.1",
+    "magnet-uri": "^7.0.7",
+    "needle": "^3.5.0",
+    "torrent-search-api": "^2.1.4",
+    "webtorrent": "^3.0.21",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/magnet-uri": "^5.1.5",
+    "@types/webtorrent": "^0.110.2",
+    "typescript": "^5.9.2"
+  }
+}
