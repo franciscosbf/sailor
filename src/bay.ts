@@ -5,6 +5,7 @@ import TorrentSearchApi, {
 import WebTorrent, { type Torrent } from "webtorrent";
 import { decode as decodeMagnetURL } from "magnet-uri";
 import { toE00Format, toS00E00Format, toS00Format } from "./util.js";
+import { createCache, type Cache } from "./cache.js";
 
 TorrentSearchApi.enablePublicProviders();
 
@@ -184,9 +185,33 @@ function sortTorrentFilesInfo(
   }
 }
 
+class DummyBayCache {
+  constructor() {}
+
+  public get(_key: string): Promise<TorrentFileInfo | null> {
+    return Promise.resolve(null);
+  }
+
+  public set(_key: string, _value: TorrentFileInfo): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public connect(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public destroy(): void {}
+}
+
+export interface BayCache {
+  url: string;
+  timeToLive: number;
+}
+
 export interface BayOptions {
   searhLimitPerProvider: number;
   searchTimeout: number;
+  cache?: BayCache;
 }
 
 class Bay {
@@ -195,6 +220,7 @@ class Bay {
   private inflightSearches: Map<string, Promise<TorrentFileInfo | null>>;
   private searhLimitPerProvider: number;
   private searchTimeout: number;
+  private cache: Cache<TorrentFileInfo>;
 
   constructor(options: BayOptions) {
     this.providers = new Map(
@@ -208,6 +234,12 @@ class Bay {
     this.inflightSearches = new Map();
     this.searhLimitPerProvider = options.searhLimitPerProvider;
     this.searchTimeout = options.searchTimeout;
+    this.cache =
+      options.cache !== undefined
+        ? createCache(options.cache.url, {
+            timeToLive: options.cache.timeToLive,
+          })
+        : new DummyBayCache();
   }
 
   private selectProviders(
@@ -318,13 +350,33 @@ class Bay {
             if (inspectedTorrents.has(infoHash)) return;
             inspectedTorrents.add(infoHash);
 
-            const torrentFileInfo = await this.lookupTorrent(
+            let torrentFileInfo: TorrentFileInfo | null = null;
+
+            try {
+              if ((torrentFileInfo = await this.cache.get(infoHash)) !== null) {
+                found.push(torrentFileInfo);
+
+                return;
+              }
+            } catch (error: any) {
+              console.warn(`Failed to query cached torrent: ${error}`);
+            }
+
+            torrentFileInfo = await this.lookupTorrent(
               magnetURI,
               infoHash,
               parameters.content,
               torrentMeta,
             );
-            if (torrentFileInfo !== null) found.push(torrentFileInfo!);
+            if (torrentFileInfo === null) return;
+
+            found.push(torrentFileInfo);
+
+            try {
+              await this.cache.set(infoHash, torrentFileInfo);
+            } catch (error: any) {
+              console.warn(`Failed to cache torrent: ${error}`);
+            }
           });
         await Promise.all(lookups);
 
@@ -336,14 +388,24 @@ class Bay {
     return sortTorrentFilesInfo(parameters.sortBy, torrentFilesInfo.flat());
   }
 
+  public async start(): Promise<void> {
+    try {
+      await this.cache.connect();
+    } catch (error: any) {
+      throw new Error(`unable to connect to the cache: ${error}`);
+    }
+  }
+
   public destroy() {
     this.webtorrent.destroy();
+
+    this.cache.destroy();
   }
 }
 
 export interface TorrentBay {
   search(parameters: SearchParameters): Promise<Stream[]>;
-
+  start(): Promise<void>;
   destroy(): void;
 }
 

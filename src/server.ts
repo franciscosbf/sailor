@@ -21,9 +21,23 @@ if (env.ADDON_PUBLISH_URL !== undefined) {
 const bay = createTorrentBay({
   searhLimitPerProvider: env.BAY_SEARCH_LIMIT_PER_PROVIDER,
   searchTimeout: env.BAY_SEARCH_TIMEOUT_MS,
+  cache:
+    env.BAY_CACHE_URL !== undefined
+      ? {
+          url: env.BAY_CACHE_URL,
+          timeToLive: env.BAY_CACHE_TTL_S,
+        }
+      : undefined,
 });
-const addonInterface = buildAddonInterface(findMedia, bay);
+try {
+  await bay.start();
+} catch (error: any) {
+  console.log(`Failed to start torrents searcher: ${error}`);
 
+  process.exit(1);
+}
+
+const addonInterface = buildAddonInterface(findMedia, bay);
 const app = express();
 const port = env.ADDON_PORT;
 const cacheMaxAge = env.ADDON_CACHE_MAX_AGE_S;
