@@ -57,6 +57,6 @@ pnpm run start
   - **default**: 4
 - **BAY_SEARCH_TIMEOUT_MS**: timeout (in milliseconds) before giving up on trying to retrieve torrent description
   - **default**: 4000
-- **BAY_CACHE_URL**: optional cache connection URL
+- **BAY_CACHE_URL**: optional Redis connection URL
 - **BAY_CACHE_TTL_S**: cache time to live (in seconds) per stored torrent
   - **default**: 1800
