@@ -6,6 +6,11 @@ sailor is a Stremio Addon for searching streams, which supports two torrent engi
 
 - [pnpm](https://pnpm.io/)
 
+```
+# install dependencies
+pnpm i
+```
+
 #### Available Commands
 
 ```shell
