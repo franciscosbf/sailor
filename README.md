@@ -23,14 +23,14 @@ pnpm run start
 
 - `GET` `/health` service status check
 - `GET` `/configure` addon configuration web page
-- `GET` `/:config/manifest.json` addon specification
-- `GET` `/:config/stream/:type/:id.json` query stream given its **type** and **id**
+- `GET` `/<config>/manifest.json` addon specification
+- `GET` `/<config>/stream/<type>/<id>.json` query stream given its **type** and **id**
   - **type**: _movie_ or _series_
   - **id**: content identifier following a format similar to IMDB's:
-    - _movie_: **tt\<number\>**, e.g., tt1636826
-    - _series_: **tt\<number\>:\<season\>:\<episode\>**, e.g., tt1124373:2:1
+    - _movie_: tt\<**number**\>, e.g., tt1636826
+    - _series_: tt\<**number**\>:\<**season**\>:\<**episode**\>, e.g., tt1124373:2:1
 
-`:config` is optional and can be configured on the web page available at `/configure`.
+`/<config>` is optional and is configured on the web page available at `/configure`.
 
 #### Environment Variables
 
