@@ -45,7 +45,7 @@ pnpm run start
 - **ADDON_PORT**: port the service will be listening to for incoming requests
   - **default**: 61062
 - **ADDON_CACHE_MAX_AGE_S**: maximum time (s) to consider a search as fresh, i.e., still valid
-  - **default**: 2592000
+  - **default**: 3600
 - **ADDON_PRE_SHUTDOWN_DELAY_MS**: server pre-shutdown timeout (ms), resulting in `GET /health` returing 503
   - **default**: 2000
 - **ADDON_SHUTDOWN_TIMEOUT_MS**: graceful server shutdown timeout (ms), before forcing exit

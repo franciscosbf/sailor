@@ -10,7 +10,7 @@ export const env = cleanEnv(process.env, {
     desc: "Port the service will be listening to for incoming requests",
   }),
   ADDON_CACHE_MAX_AGE_S: num({
-    default: 2592000,
+    default: 3600,
     desc: "Maximum time (s) to consider a search as fresh, i.e., still valid",
   }),
   ADDON_PRE_SHUTDOWN_DELAY_MS: num({
