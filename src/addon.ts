@@ -76,11 +76,7 @@ function streamHandler(
     const id = mgroups.id;
     const mediaType =
       mgroups.season === undefined ? MediaType.Movie : MediaType.Series;
-    if (
-      (mediaType === MediaType.Movie && args.type !== "movie") ||
-      (mediaType === MediaType.Series && args.type !== "series")
-    )
-      return empty;
+    if (mediaType !== args.type) return empty;
 
     let mediaMeta: MediaMeta | null;
     try {
