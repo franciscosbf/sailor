@@ -8,11 +8,6 @@ import { toE00Format, toS00E00Format, toS00Format } from "./util.js";
 
 TorrentSearchApi.enablePublicProviders();
 
-export interface Options {
-  searhLimitPerProvider: number;
-  searchTimeout: number;
-}
-
 export enum ContentType {
   Movie,
   Series,
@@ -189,13 +184,19 @@ function sortTorrentFilesInfo(
   }
 }
 
+export interface BayOptions {
+  searhLimitPerProvider: number;
+  searchTimeout: number;
+}
+
 class Bay {
   private providers: Map<Provider, TorrentProvider>;
   private webtorrent: WebTorrent.Instance;
   private inflightSearches: Map<string, Promise<TorrentFileInfo | null>>;
-  private options: Options;
+  private searhLimitPerProvider: number;
+  private searchTimeout: number;
 
-  constructor(options: Options) {
+  constructor(options: BayOptions) {
     this.providers = new Map(
       TorrentSearchApi.providers
         .filter((provider) => providerNames.has(provider.name))
@@ -205,7 +206,8 @@ class Bay {
     );
     this.webtorrent = new WebTorrent();
     this.inflightSearches = new Map();
-    this.options = options;
+    this.searhLimitPerProvider = options.searhLimitPerProvider;
+    this.searchTimeout = options.searchTimeout;
   }
 
   private selectProviders(
@@ -239,7 +241,7 @@ class Bay {
         resolve(null);
 
         cleanup();
-      }, this.options.searchTimeout);
+      }, this.searchTimeout);
 
       const findAndResolve = (torrent: Torrent) => {
         clearTimeout(timeout);
@@ -292,7 +294,7 @@ class Bay {
           torrentsMeta = await provider.search(
             parameters.query,
             formattedCategory,
-            this.options.searhLimitPerProvider,
+            this.searhLimitPerProvider,
           );
         } catch (error: any) {
           console.error(
@@ -345,6 +347,6 @@ export interface TorrentBay {
   destroy(): void;
 }
 
-export function createTorrentBay(options: Options): TorrentBay {
+export function createTorrentBay(options: BayOptions): TorrentBay {
   return new Bay(options);
 }
