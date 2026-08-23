@@ -44,16 +44,16 @@ pnpm run start
 - **ADDON_PUBLISH_URL**: optional addon URL to be published
 - **ADDON_PORT**: port the service will be listening to for incoming requests
   - **default**: 61062
-- **ADDON_CACHE_MAX_AGE_S**: maximum time (s) to consider a search as fresh, i.e., still valid
+- **ADDON_CACHE_MAX_AGE_S**: maximum time (in seconds) to consider a search as fresh, i.e., still valid
   - **default**: 3600
-- **ADDON_PRE_SHUTDOWN_DELAY_MS**: server pre-shutdown timeout (ms), resulting in `GET /health` returing 503
+- **ADDON_PRE_SHUTDOWN_DELAY_MS**: server pre-shutdown timeout (in milliseconds), resulting in `GET /health` returing 503
   - **default**: 2000
-- **ADDON_SHUTDOWN_TIMEOUT_MS**: graceful server shutdown timeout (ms), before forcing exit
+- **ADDON_SHUTDOWN_TIMEOUT_MS**: graceful server shutdown timeout (in milliseconds), before forcing exit
   - **default**: 4000
 
 ##### Torrent Providers Searcher
 
 - **BAY_SEARCH_LIMIT_PER_PROVIDER**: limit the number of torrent results found per provider search
   - **default**: 4
-- **BAY_SEARCH_TIMEOUT_MS**: timeout (ms) before giving up on trying to retrieve torrent description
+- **BAY_SEARCH_TIMEOUT_MS**: timeout (in milliseconds) before giving up on trying to retrieve torrent description
   - **default**: 4000

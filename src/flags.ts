@@ -11,15 +11,15 @@ export const env = cleanEnv(process.env, {
   }),
   ADDON_CACHE_MAX_AGE_S: num({
     default: 3600,
-    desc: "Maximum time (s) to consider a search as fresh, i.e., still valid",
+    desc: "Maximum time (in seconds) to consider a search as fresh, i.e., still valid",
   }),
   ADDON_PRE_SHUTDOWN_DELAY_MS: num({
     default: 2000,
-    desc: "Server pre-shutdown timeout (ms), resulting in GET /health returing 503",
+    desc: "Server pre-shutdown timeout (in milliseconds), resulting in GET /health returing 503",
   }),
   ADDON_SHUTDOWN_TIMEOUT_MS: num({
     default: 4000,
-    desc: "Graceful server shutdown timeout (ms), before forcing exit",
+    desc: "Graceful server shutdown timeout (in milliseconds), before forcing exit",
   }),
 
   BAY_SEARCH_LIMIT_PER_PROVIDER: num({
@@ -28,6 +28,6 @@ export const env = cleanEnv(process.env, {
   }),
   BAY_SEARCH_TIMEOUT_MS: num({
     default: 4000,
-    desc: "Timeout (ms) before giving up on trying to retrieve torrent description",
+    desc: "Timeout (in milliseconds) before giving up on trying to retrieve torrent description",
   }),
 });
