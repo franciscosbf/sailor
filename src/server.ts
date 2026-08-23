@@ -26,7 +26,7 @@ const addonInterface = buildAddonInterface(findMedia, bay);
 
 const app = express();
 const port = env.ADDON_PORT;
-const cacheMaxAge = env.ADDON_CACHE_MAX_AGE_MS;
+const cacheMaxAge = env.ADDON_CACHE_MAX_AGE_S;
 const landingHTML = landingTemplate(addonInterface.manifest);
 let shuttingDown = false;
 

@@ -44,7 +44,7 @@ pnpm run start
 - **ADDON_PUBLISH_URL**: optional addon URL to be published
 - **ADDON_PORT**: port the service will be listening to for incoming requests
   - **default**: 61062
-- **ADDON_CACHE_MAX_AGE_MS**: maximum time (ms) to consider a search as fresh, i.e., still valid
+- **ADDON_CACHE_MAX_AGE_S**: maximum time (s) to consider a search as fresh, i.e., still valid
   - **default**: 2592000
 - **ADDON_PRE_SHUTDOWN_DELAY_MS**: server pre-shutdown timeout (ms), resulting in `GET /health` returing 503
   - **default**: 2000
