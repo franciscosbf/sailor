@@ -310,8 +310,8 @@ class Bay {
             this.searhLimit,
           );
         } catch (error: any) {
-          console.error(
-            `Failed to search query provider ${provider.name}: ${error}`,
+          console.warn(
+            `Failed to search query provider ${provider.name}: ${error.message}`,
           );
 
           return [];
@@ -344,7 +344,7 @@ class Bay {
                 return;
               }
             } catch (error: any) {
-              console.warn(`Failed to query cached torrent: ${error}`);
+              console.warn(`Failed to query cached torrent: ${error.message}`);
             }
 
             torrentFileInfo = await this.lookupTorrent(
@@ -363,7 +363,7 @@ class Bay {
                   this.ttlPerMatchedTorrent,
                 );
             } catch (error: any) {
-              console.warn(`Failed to cache torrent: ${error}`);
+              console.warn(`Failed to cache torrent: ${error.message}`);
             }
             if (torrentFileInfo === null) return;
 

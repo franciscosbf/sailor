@@ -33,7 +33,7 @@ if (env.ADDON_PUBLISH_URL !== undefined) {
       console.log(`Addon published with URL ${url}`);
     })
     .catch((reason) => {
-      console.error(`Failed to publish addon: ${reason}`);
+      console.error(`Failed to publish addon: ${reason.message}`);
     });
 }
 
@@ -44,7 +44,7 @@ const cache =
 try {
   await cache.connect();
 } catch (error: any) {
-  console.log(`Failed to connect to cache: ${error}`);
+  console.log(`Failed to connect to cache: ${error.message}`);
 
   process.exit(1);
 }
@@ -117,8 +117,8 @@ server.on("listening", () => {
 
   console.log("HTTP addon accessible at:", url);
 });
-server.on("error", (err: Error) => {
-  console.error(`Server emited the following error: ${err}`);
+server.on("error", (error) => {
+  console.error(`Server emited the following error: ${error.message}`);
 
   shutdown();
 });

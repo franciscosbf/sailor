@@ -81,8 +81,8 @@ function streamHandler(
     let mediaMeta: MediaMeta | null;
     try {
       mediaMeta = await cinemata.query(id, mediaType);
-    } catch (err: any) {
-      console.error(`Failed to search Cinemeta: ${err}`);
+    } catch (error: any) {
+      console.warn(`Failed to search Cinemeta: ${error.message}`);
 
       return empty;
     }
@@ -120,7 +120,7 @@ function streamHandler(
     try {
       streams = [...new Set((await Promise.all(searches)).flat())];
     } catch (error: any) {
-      console.error(`Failed to search for available torrents: ${error}`);
+      console.warn(`Failed to search for available torrents: ${error.message}`);
 
       return empty;
     }

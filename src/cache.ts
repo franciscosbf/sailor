@@ -20,10 +20,19 @@ export interface CacheOptions {
 }
 
 class CachePool {
+  private destroyed = false;
   private pool: RedisPool;
 
   constructor(options: CacheOptions) {
-    this.pool = createClientPool({ url: options.url });
+    const pool = createClientPool({ url: options.url });
+    pool.on("error", (error: Error) => {
+      console.error(`Unexpected cache error: ${error.message}`);
+
+      this.destroy();
+    });
+
+    this.pool = pool;
+    this.destroyed = false;
   }
 
   public async set(key: string, value: any, ttl?: number): Promise<void> {
@@ -44,6 +53,9 @@ class CachePool {
   }
 
   public destroy(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
+
     this.pool.destroy();
   }
 }
