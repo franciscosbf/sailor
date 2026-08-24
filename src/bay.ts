@@ -357,7 +357,7 @@ class Bay {
                 await this.cache.set(`bay.torrent.${infoHash}`, "");
               else
                 await this.cache.set(
-                  infoHash,
+                  `bay.torrent.${infoHash}`,
                   torrentFileInfo,
                   this.ttlPerMatchedTorrent,
                 );
