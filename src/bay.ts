@@ -208,9 +208,8 @@ class Bay {
           return [provider.name as Provider, provider];
         }),
     );
-    // NOTE: latest @types/webtorrent is outdated, utPex and
-    // seedOutgoingConnections isn't present in spec, which
-    // requires casting Options to any
+    // NOTE: latest @types/webtorrent is outdated, utPex and seedOutgoingConnections
+    // aren't present in spec, which requires casting Options to any
     this.webtorrent = new WebTorrent({
       dht: false,
       lsd: false,
@@ -284,6 +283,8 @@ class Bay {
         return findAndResolve(torrent);
       }
 
+      // NOTE: latest @types/webtorrent is outdated, deselect isn't
+      // present in spec, which requires casting TorrentOptions to any
       this.webtorrent.add(magnetURI, { deselect: true } as any, (torrent) => {
         findAndResolve(torrent);
 
