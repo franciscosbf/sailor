@@ -19,7 +19,7 @@ export interface CacheOptions {
   timeToLive: number;
 }
 
-class CachePool<V> {
+class CachePool {
   private pool: RedisPool;
   private timeToLive: number;
 
@@ -28,13 +28,13 @@ class CachePool<V> {
     this.timeToLive = options.timeToLive;
   }
 
-  public async get(key: string): Promise<V | null> {
+  public async get(key: string): Promise<any | null> {
     return this.pool
       .get(key)
       .then((value) => (value !== null ? JSON.parse(value) : null));
   }
 
-  public async set(key: string, value: V): Promise<void> {
+  public async set(key: string, value: any): Promise<void> {
     await this.pool.set(key, JSON.stringify(value), {
       NX: true,
       EX: this.timeToLive,
@@ -50,15 +50,15 @@ class CachePool<V> {
   }
 }
 
-export interface Cache<V> {
-  get(key: string): Promise<V | null>;
-  set(key: string, value: V): Promise<void>;
+export interface Cache {
+  get(key: string): Promise<any | null>;
+  set(key: string, value: any): Promise<void>;
   connect(): Promise<void>;
   destroy(): void;
 }
 
-export function createCache<V>(url: string, options: CacheOptions): Cache<V> {
+export function createCache(url: string, options: CacheOptions): Cache {
   const pool = createClientPool({ url });
 
-  return new CachePool<V>(pool, options);
+  return new CachePool(pool, options);
 }

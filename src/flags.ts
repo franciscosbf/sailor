@@ -22,9 +22,9 @@ export const env = cleanEnv(process.env, {
     desc: "Graceful server shutdown timeout (in milliseconds), before forcing exit",
   }),
 
-  BAY_SEARCH_LIMIT_PER_PROVIDER: num({
-    default: 4,
-    desc: "Limit the number of torrent results found per provider search",
+  BAY_PROVIDER_SEARCH_LIMIT: num({
+    default: 6,
+    desc: "Limit the number of torrent results returned by each provider on a per-request basis",
   }),
   BAY_SEARCH_TIMEOUT_MS: num({
     default: 4000,

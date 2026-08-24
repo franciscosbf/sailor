@@ -16,15 +16,15 @@ import {
   type TorrentBay,
 } from "./bay.js";
 import {
-  type CinemataMediaFinder,
+  type CinemataSearcher,
   MediaType,
   type MediaMeta,
 } from "./cinemata.js";
 import type { StreamSchema } from "@stremio-addon/zod";
-import { toE00Format, toS00Format } from "./util.js";
+import { toS00Format } from "./util.js";
 
 function streamHandler(
-  findMedia: CinemataMediaFinder,
+  cinemata: CinemataSearcher,
   bay: TorrentBay,
 ): (args: StreamHandlerArgs<DefaultConfig>) => Promise<
   WithCache<{
@@ -80,7 +80,7 @@ function streamHandler(
 
     let mediaMeta: MediaMeta | null;
     try {
-      mediaMeta = await findMedia(id, mediaType);
+      mediaMeta = await cinemata.query(id, mediaType);
     } catch (err: any) {
       console.error(`Failed to search Cinemeta: ${err}`);
 
@@ -96,8 +96,6 @@ function streamHandler(
       content = { type: ContentType.Movie };
     } else {
       const s00ed = toS00Format(mgroups.season);
-      const e00ed = toE00Format(mgroups.episode);
-      queries.push(`${name} ${s00ed}${e00ed}`);
       queries.push(`${name} ${s00ed}`);
       if (mediaMeta.seasons !== undefined)
         queries.push(`${name} S01-${toS00Format(mediaMeta.seasons)}`);
@@ -120,7 +118,7 @@ function streamHandler(
 
     let streams: Stream[];
     try {
-      streams = (await Promise.all(searches)).flat();
+      streams = [...new Set((await Promise.all(searches)).flat())];
     } catch (error: any) {
       console.error(`Failed to search for available torrents: ${error}`);
 
@@ -155,12 +153,12 @@ function streamHandler(
 }
 
 export function buildAddonInterface(
-  findMedia: CinemataMediaFinder,
+  cinemata: CinemataSearcher,
   bay: TorrentBay,
 ): AddonInterface {
   const builder = new AddonBuilder(manifest);
 
   return builder
-    .defineStreamHandler(streamHandler(findMedia, bay))
+    .defineStreamHandler(streamHandler(cinemata, bay))
     .getInterface();
 }

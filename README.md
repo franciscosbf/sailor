@@ -53,7 +53,7 @@ pnpm run start
 
 ##### Torrent Providers Searcher
 
-- **BAY_SEARCH_LIMIT_PER_PROVIDER**: limit the number of torrent results found per provider search
+- **BAY_PROVIDER_SEARCH_LIMIT**: limit the number of torrent results returned by each provider on a per-request basis
   - **default**: 4
 - **BAY_SEARCH_TIMEOUT_MS**: timeout (in milliseconds) before giving up on trying to retrieve torrent description
   - **default**: 4000

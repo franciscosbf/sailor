@@ -5,7 +5,7 @@ import TorrentSearchApi, {
 import WebTorrent, { type Torrent } from "webtorrent";
 import { decode as decodeMagnetURL } from "magnet-uri";
 import { toE00Format, toS00E00Format, toS00Format } from "./util.js";
-import { createCache, type Cache } from "./cache.js";
+import { type Cache } from "./cache.js";
 
 TorrentSearchApi.enablePublicProviders();
 
@@ -31,8 +31,7 @@ export enum Provider {
   TorrentProject = "TorrentProject",
   ThePirateBay = "ThePirateBay",
 }
-
-const providerNames = new Set(Object.keys(Provider));
+const PROVIDER_NAMES = new Set(Object.keys(Provider));
 
 export enum SortBy {
   Seeders,
@@ -185,24 +184,6 @@ function sortTorrentFilesInfo(
   }
 }
 
-class DummyBayCache {
-  constructor() {}
-
-  public get(_key: string): Promise<TorrentFileInfo | null> {
-    return Promise.resolve(null);
-  }
-
-  public set(_key: string, _value: TorrentFileInfo): Promise<void> {
-    return Promise.resolve();
-  }
-
-  public connect(): Promise<void> {
-    return Promise.resolve();
-  }
-
-  public destroy(): void {}
-}
-
 export interface BayCache {
   url: string;
   timeToLive: number;
@@ -211,35 +192,30 @@ export interface BayCache {
 export interface BayOptions {
   searhLimitPerProvider: number;
   searchTimeout: number;
-  cache?: BayCache;
+  cache: Cache;
 }
 
 class Bay {
   private providers: Map<Provider, TorrentProvider>;
   private webtorrent: WebTorrent.Instance;
   private inflightSearches: Map<string, Promise<TorrentFileInfo | null>>;
-  private searhLimitPerProvider: number;
+  private searhLimit: number;
   private searchTimeout: number;
-  private cache: Cache<TorrentFileInfo>;
+  private cache: Cache;
 
   constructor(options: BayOptions) {
     this.providers = new Map(
       TorrentSearchApi.providers
-        .filter((provider) => providerNames.has(provider.name))
+        .filter((provider) => PROVIDER_NAMES.has(provider.name))
         .map((provider) => {
           return [provider.name as Provider, provider];
         }),
     );
     this.webtorrent = new WebTorrent();
     this.inflightSearches = new Map();
-    this.searhLimitPerProvider = options.searhLimitPerProvider;
+    this.searhLimit = options.searhLimitPerProvider;
     this.searchTimeout = options.searchTimeout;
-    this.cache =
-      options.cache !== undefined
-        ? createCache(options.cache.url, {
-            timeToLive: options.cache.timeToLive,
-          })
-        : new DummyBayCache();
+    this.cache = options.cache;
   }
 
   private selectProviders(
@@ -326,7 +302,7 @@ class Bay {
           torrentsMeta = await provider.search(
             parameters.query,
             formattedCategory,
-            this.searhLimitPerProvider,
+            this.searhLimit,
           );
         } catch (error: any) {
           console.error(
@@ -339,6 +315,7 @@ class Bay {
         const found: TorrentFileInfo[] = [];
 
         const lookups = torrentsMeta
+          .slice(0, this.searhLimit)
           .filter(desiredTorrent)
           .map(async (torrentMeta) => {
             const magnetURI = await provider.getMagnet(torrentMeta);
@@ -398,14 +375,11 @@ class Bay {
 
   public destroy() {
     this.webtorrent.destroy();
-
-    this.cache.destroy();
   }
 }
 
 export interface TorrentBay {
   search(parameters: SearchParameters): Promise<Stream[]>;
-  start(): Promise<void>;
   destroy(): void;
 }
 

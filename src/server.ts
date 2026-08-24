@@ -5,7 +5,26 @@ import { getRouter } from "@stremio-addon/node-express";
 import express from "express";
 import { type AddressInfo } from "net";
 import { createTorrentBay } from "./bay.js";
-import { findMedia } from "./cinemata.js";
+import { createCinemataSearcher } from "./cinemata.js";
+import { createCache } from "./cache.js";
+
+class DummyCache {
+  constructor() {}
+
+  public get(_key: string): Promise<any | null> {
+    return Promise.resolve(null);
+  }
+
+  public set(_key: string, _value: any): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public connect(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public destroy(): void {}
+}
 
 if (env.ADDON_PUBLISH_URL !== undefined) {
   const url = `${env.ADDON_PUBLISH_URL}/manifest.json`;
@@ -18,26 +37,25 @@ if (env.ADDON_PUBLISH_URL !== undefined) {
     });
 }
 
-const bay = createTorrentBay({
-  searhLimitPerProvider: env.BAY_SEARCH_LIMIT_PER_PROVIDER,
-  searchTimeout: env.BAY_SEARCH_TIMEOUT_MS,
-  cache:
-    env.BAY_CACHE_URL !== undefined
-      ? {
-          url: env.BAY_CACHE_URL,
-          timeToLive: env.BAY_CACHE_TTL_S,
-        }
-      : undefined,
-});
+const cache =
+  env.BAY_CACHE_URL !== undefined
+    ? createCache(env.BAY_CACHE_URL, { timeToLive: env.BAY_CACHE_TTL_S })
+    : new DummyCache();
 try {
-  await bay.start();
+  await cache.connect();
 } catch (error: any) {
-  console.log(`Failed to start torrents searcher: ${error}`);
+  console.log(`Failed to connect to cache: ${error}`);
 
   process.exit(1);
 }
+const cinemata = createCinemataSearcher(cache);
+const bay = createTorrentBay({
+  searhLimitPerProvider: env.BAY_PROVIDER_SEARCH_LIMIT,
+  searchTimeout: env.BAY_SEARCH_TIMEOUT_MS,
+  cache,
+});
 
-const addonInterface = buildAddonInterface(findMedia, bay);
+const addonInterface = buildAddonInterface(cinemata, bay);
 const app = express();
 const port = env.ADDON_PORT;
 const cacheMaxAge = env.ADDON_CACHE_MAX_AGE_S;
@@ -77,6 +95,10 @@ const shutdown = async (signal?: string) => {
     bay.destroy();
 
     console.log("Torrent peer connections destroyed");
+
+    cache.destroy();
+
+    console.log("Cache connections destroyed");
 
     process.exit(0);
   });
