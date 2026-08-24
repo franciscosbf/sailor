@@ -21,24 +21,24 @@ export interface CacheOptions {
 
 class CachePool {
   private pool: RedisPool;
-  private timeToLive: number;
+  private ttl: number;
 
   constructor(pool: RedisPool, options: CacheOptions) {
     this.pool = pool;
-    this.timeToLive = options.timeToLive;
+    this.ttl = options.timeToLive;
+  }
+
+  public async set(key: string, value: any, ttl?: number): Promise<void> {
+    await this.pool.set(key, JSON.stringify(value), {
+      NX: true,
+      EX: ttl,
+    });
   }
 
   public async get(key: string): Promise<any | null> {
     return this.pool
       .get(key)
       .then((value) => (value !== null ? JSON.parse(value) : null));
-  }
-
-  public async set(key: string, value: any): Promise<void> {
-    await this.pool.set(key, JSON.stringify(value), {
-      NX: true,
-      EX: this.timeToLive,
-    });
   }
 
   public async connect(): Promise<void> {
@@ -52,7 +52,7 @@ class CachePool {
 
 export interface Cache {
   get(key: string): Promise<any | null>;
-  set(key: string, value: any): Promise<void>;
+  set(key: string, value: any, ttl?: number): Promise<void>;
   connect(): Promise<void>;
   destroy(): void;
 }

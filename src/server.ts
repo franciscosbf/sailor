@@ -11,7 +11,7 @@ import { createCache } from "./cache.js";
 class DummyCache {
   constructor() {}
 
-  public get(_key: string): Promise<any | null> {
+  public get(_key: string): Promise<null> {
     return Promise.resolve(null);
   }
 
@@ -53,6 +53,7 @@ const bay = createTorrentBay({
   searhLimitPerProvider: env.BAY_PROVIDER_SEARCH_LIMIT,
   searchTimeout: env.BAY_SEARCH_TIMEOUT_MS,
   cache,
+  ttlPerMatchedTorrent: env.BAY_CACHE_TTL_S,
 });
 
 const addonInterface = buildAddonInterface(cinemata, bay);

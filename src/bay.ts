@@ -184,15 +184,11 @@ function sortTorrentFilesInfo(
   }
 }
 
-export interface BayCache {
-  url: string;
-  timeToLive: number;
-}
-
 export interface BayOptions {
   searhLimitPerProvider: number;
   searchTimeout: number;
   cache: Cache;
+  ttlPerMatchedTorrent: number;
 }
 
 class Bay {
@@ -202,6 +198,7 @@ class Bay {
   private searhLimit: number;
   private searchTimeout: number;
   private cache: Cache;
+  private ttlPerMatchedTorrent: number;
 
   constructor(options: BayOptions) {
     this.providers = new Map(
@@ -211,11 +208,19 @@ class Bay {
           return [provider.name as Provider, provider];
         }),
     );
-    this.webtorrent = new WebTorrent();
+    // NOTE: latest @types/webtorrent is outdated, seedOutgoingConnections
+    // isn't present in spec, which requires casting Options to any
+    this.webtorrent = new WebTorrent({
+      lsd: false,
+      seedOutgoingConnections: false,
+      dowloadLimit: -1,
+      uploadLimit: -1,
+    } as any);
     this.inflightSearches = new Map();
     this.searhLimit = options.searhLimitPerProvider;
     this.searchTimeout = options.searchTimeout;
     this.cache = options.cache;
+    this.ttlPerMatchedTorrent = options.ttlPerMatchedTorrent;
   }
 
   private selectProviders(
@@ -327,11 +332,12 @@ class Bay {
             if (inspectedTorrents.has(infoHash)) return;
             inspectedTorrents.add(infoHash);
 
-            let torrentFileInfo: TorrentFileInfo | null = null;
+            let torrentFileInfo: TorrentFileInfo | "" | null = null;
 
             try {
-              if ((torrentFileInfo = await this.cache.get(infoHash)) !== null) {
-                found.push(torrentFileInfo);
+              torrentFileInfo = await this.cache.get(infoHash);
+              if (torrentFileInfo !== null) {
+                if (torrentFileInfo !== "") found.push(torrentFileInfo);
 
                 return;
               }
@@ -345,15 +351,21 @@ class Bay {
               parameters.content,
               torrentMeta,
             );
-            if (torrentFileInfo === null) return;
-
-            found.push(torrentFileInfo);
-
+            // NOTE: nullable results are cached as well to speedup search
             try {
-              await this.cache.set(infoHash, torrentFileInfo);
+              if (torrentFileInfo === null) await this.cache.set(infoHash, "");
+              else
+                await this.cache.set(
+                  infoHash,
+                  torrentFileInfo,
+                  this.ttlPerMatchedTorrent,
+                );
             } catch (error: any) {
               console.warn(`Failed to cache torrent: ${error}`);
             }
+            if (torrentFileInfo === null) return;
+
+            found.push(torrentFileInfo);
           });
         await Promise.all(lookups);
 

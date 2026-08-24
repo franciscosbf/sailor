@@ -28,7 +28,7 @@ export const env = cleanEnv(process.env, {
   }),
   BAY_SEARCH_TIMEOUT_MS: num({
     default: 4000,
-    desc: "Timeout (in milliseconds) before giving up on trying to retrieve torrent description",
+    desc: "Timeout (in milliseconds) before giving up on trying to retrieve torrent info",
   }),
   BAY_CACHE_URL: url({
     desc: "Optional Redis connection URL",
