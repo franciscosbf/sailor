@@ -247,7 +247,7 @@ class Bay {
     content: Content,
     torrentMeta: TorrentMeta,
   ): Promise<TorrentFileInfo | null> {
-    let inflightSearch = this.inflightSearches.get(magnetURI);
+    let inflightSearch = this.inflightSearches.get(infoHash);
     if (inflightSearch !== undefined) return inflightSearch;
 
     inflightSearch = new Promise((resolve, _) => {
@@ -280,8 +280,8 @@ class Bay {
       let torrent = this.webtorrent.torrents.find(
         (torrent) => torrent.infoHash === infoHash,
       );
-      if (torrent !== undefined && torrent!.name) {
-        return findAndResolve(torrent!);
+      if (torrent !== undefined) {
+        return findAndResolve(torrent);
       }
 
       this.webtorrent.add(magnetURI, { deselect: true } as any, (torrent) => {
@@ -291,12 +291,12 @@ class Bay {
       });
     });
 
-    this.inflightSearches.set(magnetURI, inflightSearch);
+    this.inflightSearches.set(infoHash, inflightSearch);
 
     try {
       return await inflightSearch;
     } finally {
-      this.inflightSearches.delete(magnetURI);
+      this.inflightSearches.delete(infoHash);
     }
   }
 
