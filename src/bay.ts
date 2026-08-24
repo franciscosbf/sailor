@@ -316,7 +316,7 @@ class Bay {
           );
         } catch (error: any) {
           console.warn(
-            `Failed to search query provider ${provider.name}: ${error.message}`,
+            `Failed to query provider ${provider.name}: ${error.message}`,
           );
 
           return [];
