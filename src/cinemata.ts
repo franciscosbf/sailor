@@ -22,11 +22,11 @@ class Cinemata {
   }
 
   public async query(id: string, type: MediaType): Promise<MediaMeta | null> {
+    const cacheKey = `cinemata.media.meta.${id}`;
     let meta: MediaMeta | null;
 
     try {
-      if ((meta = await this.cache.get(`cinemata.media.meta.${id}`)) !== null)
-        return meta;
+      if ((meta = await this.cache.get(cacheKey)) !== null) return meta;
     } catch (error: any) {
       console.warn(`Failed to query cached Cinemata media meta: ${error}`);
     }
@@ -47,7 +47,7 @@ class Cinemata {
     }
 
     try {
-      await this.cache.set(`cinemata.media.meta.${id}`, meta);
+      await this.cache.set(cacheKey, meta);
     } catch (error: any) {
       console.warn(`Failed to cache Cinemata media meta: ${error}`);
     }
