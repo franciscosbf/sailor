@@ -15,11 +15,15 @@ type RedisPool = RedisClientPoolType<
   {}
 >;
 
+export interface CacheOptions {
+  url: string;
+}
+
 class CachePool {
   private pool: RedisPool;
 
-  constructor(pool: RedisPool) {
-    this.pool = pool;
+  constructor(options: CacheOptions) {
+    this.pool = createClientPool({ url: options.url });
   }
 
   public async set(key: string, value: any, ttl?: number): Promise<void> {
@@ -51,8 +55,6 @@ export interface Cache {
   destroy(): void;
 }
 
-export function createCache(url: string): Cache {
-  const pool = createClientPool({ url });
-
-  return new CachePool(pool);
+export function createCache(options: CacheOptions): Cache {
+  return new CachePool(options);
 }

@@ -25,7 +25,8 @@ class Cinemata {
     let meta: MediaMeta | null;
 
     try {
-      if ((meta = await this.cache.get(id)) !== null) return meta;
+      if ((meta = await this.cache.get(`cinemata.media.meta.${id}`)) !== null)
+        return meta;
     } catch (error: any) {
       console.warn(`Failed to query cached Cinemata media meta: ${error}`);
     }
@@ -46,7 +47,7 @@ class Cinemata {
     }
 
     try {
-      await this.cache.set(id, meta);
+      await this.cache.set(`cinemata.media.meta.${id}`, meta);
     } catch (error: any) {
       console.warn(`Failed to cache Cinemata media meta: ${error}`);
     }

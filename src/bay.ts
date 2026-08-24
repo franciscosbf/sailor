@@ -335,7 +335,7 @@ class Bay {
             let torrentFileInfo: TorrentFileInfo | "" | null = null;
 
             try {
-              torrentFileInfo = await this.cache.get(infoHash);
+              torrentFileInfo = await this.cache.get(`bay.torrent.${infoHash}`);
               if (torrentFileInfo !== null) {
                 if (torrentFileInfo !== "") found.push(torrentFileInfo);
 
@@ -353,7 +353,8 @@ class Bay {
             );
             // NOTE: nullable results are cached as well to speedup search
             try {
-              if (torrentFileInfo === null) await this.cache.set(infoHash, "");
+              if (torrentFileInfo === null)
+                await this.cache.set(`bay.torrent.${infoHash}`, "");
               else
                 await this.cache.set(
                   infoHash,
