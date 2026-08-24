@@ -384,14 +384,6 @@ class Bay {
     return sortTorrentFilesInfo(parameters.sortBy, torrentFilesInfo.flat());
   }
 
-  public async start(): Promise<void> {
-    try {
-      await this.cache.connect();
-    } catch (error: any) {
-      throw new Error(`unable to connect to the cache: ${error}`);
-    }
-  }
-
   public destroy() {
     this.webtorrent.destroy();
   }
