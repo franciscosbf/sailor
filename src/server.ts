@@ -39,7 +39,7 @@ if (env.ADDON_PUBLISH_URL !== undefined) {
 
 const cache =
   env.BAY_CACHE_URL !== undefined
-    ? createCache(env.BAY_CACHE_URL, { timeToLive: env.BAY_CACHE_TTL_S })
+    ? createCache(env.BAY_CACHE_URL)
     : new DummyCache();
 try {
   await cache.connect();
