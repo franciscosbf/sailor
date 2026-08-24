@@ -220,8 +220,6 @@ class Bay {
       webSeeds: false,
       utp: false,
       seedOutgoingConnections: false,
-      dowloadLimit: -1,
-      uploadLimit: -1,
     } as any);
     this.inflightSearches = new Map();
     this.searhLimit = options.searhLimitPerProvider;
