@@ -24,7 +24,10 @@ class CachePool {
   private pool: RedisPool;
 
   constructor(options: CacheOptions) {
-    const pool = createClientPool({ url: options.url });
+    const pool = createClientPool({
+      url: options.url,
+      disableOfflineQueue: true,
+    });
     pool.on("error", (error: Error) => {
       console.error(`Unexpected cache error: ${error.message}`);
 
