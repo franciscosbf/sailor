@@ -107,18 +107,14 @@ function streamHandler(
       };
     }
 
-    const searches = queries.map((query) =>
-      bay.search({
-        query,
+    let streams: Stream[];
+    try {
+      streams = await bay.search({
+        queries,
         content,
         providers: [...providers],
         sortBy,
-      }),
-    );
-
-    let streams: Stream[];
-    try {
-      streams = [...new Set((await Promise.all(searches)).flat())];
+      });
     } catch (error: any) {
       console.warn(`Failed to search for available torrents: ${error.message}`);
 

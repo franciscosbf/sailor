@@ -41,7 +41,7 @@ export enum SortBy {
 }
 
 export interface SearchParameters {
-  query: string;
+  queries: string[];
   content: Content;
   providers: Provider[];
   sortBy: SortBy;
@@ -302,30 +302,40 @@ class Bay {
   }
 
   public async search(parameters: SearchParameters): Promise<Stream[]> {
-    if (parameters.providers.length === 0) return [];
+    if (parameters.queries.length === 0 || parameters.providers.length === 0)
+      return [];
 
     const desiredTorrent = buildTorrentMetaFilter(parameters.content);
     const inspectedTorrents = new Set();
     const searchesPerProvider = this.selectProviders(parameters).map(
       async ({ provider, formattedCategory }) => {
-        let torrentsMeta: TorrentMeta[];
-        try {
-          torrentsMeta = await provider.search(
-            parameters.query,
-            formattedCategory,
-            this.searhLimit,
-          );
-        } catch (error: any) {
-          console.warn(
-            `Failed to query provider ${provider.name}: ${error.message}`,
-          );
+        const queried: TorrentMeta[][] = [];
 
-          return [];
-        }
+        const searches = parameters.queries.map(async (query) => {
+          let torrentsMeta: TorrentMeta[];
+
+          try {
+            torrentsMeta = await provider.search(
+              query,
+              formattedCategory,
+              this.searhLimit,
+            );
+          } catch (error: any) {
+            console.warn(
+              `Failed to query provider ${provider.name} with '${query}': ${error.message}`,
+            );
+
+            return;
+          }
+
+          if (torrentsMeta.length > 0) queried.push(torrentsMeta);
+        });
+        await Promise.all(searches);
 
         const found: TorrentFileInfo[] = [];
 
-        const lookups = torrentsMeta
+        const lookups = queried
+          .flat()
           .slice(0, this.searhLimit)
           .filter(desiredTorrent)
           .map(async (torrentMeta) => {
