@@ -235,14 +235,16 @@ class Bay {
 
   private selectProviders(
     parameters: SearchParameters,
-  ): { provider: TorrentProvider; formattedCategory: string }[] {
+  ): { provider: TorrentProvider; category: string; query: string }[] {
     return parameters.providers
       .map((provider) => this.providers.get(provider))
       .filter((provider) => provider !== undefined)
-      .map((provider) => {
+      .flatMap((provider) => {
         const category = parseCategory(provider);
 
-        return { provider, formattedCategory: category };
+        return parameters.queries.map((query) => {
+          return { provider, category, query };
+        });
       });
   }
 
@@ -346,19 +348,14 @@ class Bay {
 
     const desiredTorrent = buildTorrentMetaFilter(parameters.content);
     const inspectedTorrents = new Set();
-    const searchesPerProvider = this.selectProviders(parameters)
-      .flatMap((provider) => {
-        return parameters.queries.map((query) => {
-          return { ...provider, query };
-        });
-      })
-      .map(async ({ provider, formattedCategory, query }) => {
+    const searchesPerProvider = this.selectProviders(parameters).map(
+      async ({ provider, category, query }) => {
         let torrentsMeta: TorrentMeta[];
 
         try {
           torrentsMeta = await provider.search(
             query,
-            formattedCategory,
+            category,
             this.searhLimit,
           );
         } catch (error: any) {
@@ -398,7 +395,8 @@ class Bay {
         await Promise.all(lookups);
 
         return found;
-      });
+      },
+    );
     const torrentFilesInfo = await Promise.all(searchesPerProvider);
 
     return sortTorrentFilesInfo(parameters.sortBy, torrentFilesInfo.flat());
