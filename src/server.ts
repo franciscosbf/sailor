@@ -97,9 +97,11 @@ const shutdown = async (signal?: string) => {
 
     console.log("Torrent peer connections destroyed");
 
-    cache.destroy();
+    if (env.BAY_CACHE_URL !== undefined) {
+      cache.destroy();
 
-    console.log("Cache connections destroyed");
+      console.log("Cache connections destroyed");
+    }
 
     process.exit(0);
   });
