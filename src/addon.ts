@@ -137,13 +137,15 @@ function streamHandler(
           quality = "4k";
           break;
       }
+      const name = `${manifest.name}\n${quality}`;
+      const sources = stream.announce.map((announce) => `tracker:${announce}`);
 
       return {
         infoHash: stream.infoHash,
         fileIdx: stream.fileIdx,
-        name: `${manifest.name}\n${quality}`,
+        name,
         description: stream.name,
-        sources: stream.announce.map((announce) => `tracker:${announce}`),
+        sources,
         behaviorHints: {
           videoSize: stream.size,
           filename: stream.name,
