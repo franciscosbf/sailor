@@ -281,7 +281,10 @@ class Bay {
     const cacheKey = `bay.torrent.${infoHash}`;
 
     try {
-      let torrent: Torrent | 0 | null = await this.cache.get(cacheKey);
+      let torrent: Torrent | 0 | null = await this.cache.get(
+        cacheKey,
+        this.ttlPerTorrent,
+      );
       if (torrent !== null) return torrent !== 0 ? find(torrent) : null;
     } catch (error: any) {
       console.warn(`Failed to query cached torrent: ${error.message}`);

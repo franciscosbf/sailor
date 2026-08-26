@@ -45,10 +45,18 @@ class CachePool {
     });
   }
 
-  public async get(key: string): Promise<any | null> {
-    return this.pool
-      .get(key)
-      .then((value) => (value !== null ? JSON.parse(value) : null));
+  public async get(key: string, ttl?: number): Promise<any | null> {
+    const get =
+      ttl !== undefined
+        ? this.pool
+            .multi()
+            .get(key)
+            .expire(key, ttl, "XX")
+            .exec()
+            .then((results) => results[0] as any | null)
+        : this.pool.get(key);
+
+    return get.then((value) => (value !== null ? JSON.parse(value) : null));
   }
 
   public async connect(): Promise<void> {
@@ -64,7 +72,7 @@ class CachePool {
 }
 
 export interface Cache {
-  get(key: string): Promise<any | null>;
+  get(key: string, ttl?: number): Promise<any | null>;
   set(key: string, value: any, ttl?: number): Promise<void>;
   connect(): Promise<void>;
   destroy(): void;
