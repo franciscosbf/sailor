@@ -27,7 +27,7 @@ export const env = cleanEnv(process.env, {
     desc: "Limit the number of torrent results returned by each provider on a per-request basis",
   }),
   BAY_SEARCH_TIMEOUT_MS: num({
-    default: 4000,
+    default: 12000,
     desc: "Timeout (in milliseconds) before giving up on trying to retrieve torrent info",
   }),
   BAY_CACHE_URL: url({
