@@ -107,9 +107,18 @@ function parseCategory(provider: TorrentProvider): string {
 }
 
 function buildTorrentTitleFilter(content: Content): (title: string) => boolean {
-  const name = content.name.replace(".", "\\.?").replace(" ", "( |\\.)");
+  const nonAlphaRegex = /[^a-z]/i;
+  const nameChars = [];
+  for (let i = 0; i < content.name.length; i++) {
+    const cchar = content.name.charAt(i);
+    if (nonAlphaRegex.test(cchar)) {
+      const pchar = content.name.charAt(i - 1);
+      if (!nonAlphaRegex.test(pchar)) nameChars.push("[^a-z]*");
+    } else nameChars.push(cchar);
+  }
+  const name = nameChars.join("");
 
-  let pattern: string;
+  let subPattern: string;
   switch (content.type) {
     case ContentType.Series:
       const s00ed = toS00Format(content.season);
@@ -119,14 +128,14 @@ function buildTorrentTitleFilter(content: Content): (title: string) => boolean {
         const s00ed = toS00Format(content.seasons);
         possibilities += `|S01-${s00ed}`;
       }
-      pattern = `${name}.*(${possibilities})`;
+      subPattern = `${name}.*(${possibilities})`;
       break;
     default:
-      pattern = name;
+      subPattern = name;
       break;
   }
 
-  return (title) => new RegExp(pattern, "i").test(title);
+  return (title) => new RegExp(`^${subPattern}`, "i").test(title);
 }
 
 function buildTorrentMetaFilter(
