@@ -30,6 +30,7 @@ export type Content = MovieContent | SeriesContent;
 export enum Provider {
   TorrentProject = "TorrentProject",
   ThePirateBay = "ThePirateBay",
+  LimeTorrents = "LimeTorrents",
 }
 const PROVIDER_NAMES = new Set(Object.keys(Provider));
 

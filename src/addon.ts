@@ -43,7 +43,9 @@ function streamHandler(
       if (config.removeTorrentProject !== undefined)
         providers.delete(Provider.TorrentProject);
       if (config.removeThePirateBay !== undefined)
-        providers.delete(Provider.TorrentProject);
+        providers.delete(Provider.ThePirateBay);
+      if (config.removeLimeTorrents !== undefined)
+        providers.delete(Provider.LimeTorrents);
 
       if (providers.size === 0) return empty;
 

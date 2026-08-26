@@ -68,7 +68,11 @@ describe("addon", () => {
       expect(bay.search).toHaveBeenCalledExactlyOnceWith({
         queries: ["Interstellar 2014"],
         content: { type: ContentType.Movie },
-        providers: [Provider.TorrentProject, Provider.ThePirateBay],
+        providers: [
+          Provider.TorrentProject,
+          Provider.ThePirateBay,
+          Provider.LimeTorrents,
+        ],
         sortBy: SortBy.Seeders,
       });
 
@@ -139,7 +143,7 @@ describe("addon", () => {
           episode: "1",
           seasons: "4",
         },
-        providers: [Provider.ThePirateBay],
+        providers: [Provider.ThePirateBay, Provider.LimeTorrents],
         sortBy: SortBy.SeedersThenQuality,
       });
 

@@ -36,9 +36,14 @@ export const manifest: ManifestSchema = {
       title: "Don't include TorrentProject",
     },
     {
-      key: "removethePirateBay",
+      key: "removeThePirateBay",
       type: "checkbox",
       title: "Don't include The Pirate Bay",
+    },
+    {
+      key: "removeLimeTorrents",
+      type: "checkbox",
+      title: "Don't include LimeTorrents",
     },
   ],
 };
