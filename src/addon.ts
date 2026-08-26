@@ -36,18 +36,14 @@ function streamHandler(
   return async (args) => {
     if (args.type !== "movie" && args.type !== "series") return empty;
 
-    let providers = new Set(Object.keys(Provider) as Provider[]);
-    let sortBy = SortBy.Seeders;
+    let providers = Object.keys(Provider) as Provider[];
+    let sortBy = SortBy.QualityThenSeeders;
     const config = args.config;
     if (config !== undefined) {
-      if (config.removeTorrentProject !== undefined)
-        providers.delete(Provider.TorrentProject);
-      if (config.removeThePirateBay !== undefined)
-        providers.delete(Provider.ThePirateBay);
-      if (config.removeLimeTorrents !== undefined)
-        providers.delete(Provider.LimeTorrents);
-
-      if (providers.size === 0) return empty;
+      let selectedProviders = providers.filter((provider) =>
+        config.hasOwnProperty(provider),
+      ) as Provider[];
+      if (selectedProviders.length > 0) providers = selectedProviders;
 
       switch (config.sort) {
         case "Seeders":
@@ -115,7 +111,7 @@ function streamHandler(
       streams = await bay.search({
         queries,
         content,
-        providers: [...providers],
+        providers,
         sortBy,
       });
     } catch (error: any) {
