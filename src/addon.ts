@@ -95,7 +95,7 @@ function streamHandler(
     let content: Content;
     if (mediaType == MediaType.Movie) {
       queries.push(`${name} ${mediaMeta.date}`);
-      content = { type: ContentType.Movie };
+      content = { type: ContentType.Movie, name };
     } else {
       const s00ed = toS00Format(mgroups.season);
       queries.push(`${name} ${s00ed}`);
@@ -103,6 +103,7 @@ function streamHandler(
         queries.push(`${name} S01-${toS00Format(mediaMeta.seasons)}`);
       content = {
         type: ContentType.Series,
+        name,
         season: mgroups.season,
         episode: mgroups.episode,
         seasons: mediaMeta.seasons,
@@ -140,11 +141,12 @@ function streamHandler(
       return {
         infoHash: stream.infoHash,
         fileIdx: stream.fileIdx,
-        name: quality,
+        name: `${manifest.name}\n${quality}`,
         description: stream.name,
-        sources: stream.announce,
+        sources: stream.announce.map((announce) => `tracker:${announce}`),
         behaviorHints: {
           videoSize: stream.size,
+          filename: stream.name,
         },
       };
     });

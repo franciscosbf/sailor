@@ -16,10 +16,12 @@ export enum ContentType {
 
 export interface MovieContent {
   type: ContentType.Movie;
+  name: string;
 }
 
 export interface SeriesContent {
   type: ContentType.Series;
+  name: string;
   season: string;
   episode: string;
   seasons?: string;
@@ -105,6 +107,9 @@ function parseCategory(provider: TorrentProvider): string {
 }
 
 function buildTorrentTitleFilter(content: Content): (title: string) => boolean {
+  const name = content.name.replace(".", "\\.?").replace(" ", "( |\\.)");
+
+  let pattern: string;
   switch (content.type) {
     case ContentType.Series:
       const s00ed = toS00Format(content.season);
@@ -114,11 +119,14 @@ function buildTorrentTitleFilter(content: Content): (title: string) => boolean {
         const s00ed = toS00Format(content.seasons);
         possibilities += `|S01-${s00ed}`;
       }
-
-      return (title) => new RegExp(`(${possibilities})`, "i").test(title);
+      pattern = `${name}.*(${possibilities})`;
+      break;
     default:
-      return (_) => true;
+      pattern = name;
+      break;
   }
+
+  return (title) => new RegExp(pattern, "i").test(title);
 }
 
 function buildTorrentMetaFilter(
