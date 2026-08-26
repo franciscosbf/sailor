@@ -2,7 +2,7 @@ import TorrentSearchApi, {
   type TorrentProvider,
   type TorrentMeta,
 } from "torrent-search-api";
-import WebTorrent, { type Torrent } from "webtorrent";
+import WebTorrent from "webtorrent";
 import { decode as decodeMagnetURL } from "magnet-uri";
 import { toE00Format, toS00E00Format, toS00Format } from "./util.js";
 import { type Cache } from "./cache.js";
@@ -71,6 +71,12 @@ export interface Stream {
   infoHash: string;
   quality: StreamQuality;
   announce: string[];
+  size: number;
+}
+
+interface Torrent {
+  announce: string[];
+  files: { name: string; length: number }[];
 }
 
 function decodeQuality(raw: string): StreamQuality | undefined {
@@ -188,7 +194,7 @@ export interface BayOptions {
   searhLimitPerProvider: number;
   searchTimeout: number;
   cache: Cache;
-  ttlPerMatchedTorrent: number;
+  ttlPerTorrent: number;
 }
 
 class Bay {
@@ -198,7 +204,7 @@ class Bay {
   private searhLimit: number;
   private searchTimeout: number;
   private cache: Cache;
-  private ttlPerMatchedTorrent: number;
+  private ttlPerTorrent: number;
 
   constructor(options: BayOptions) {
     this.providers = new Map(
@@ -224,7 +230,7 @@ class Bay {
     this.searhLimit = options.searhLimitPerProvider;
     this.searchTimeout = options.searchTimeout;
     this.cache = options.cache;
-    this.ttlPerMatchedTorrent = options.ttlPerMatchedTorrent;
+    this.ttlPerTorrent = options.ttlPerTorrent;
   }
 
   private selectProviders(
@@ -249,6 +255,27 @@ class Bay {
     let inflightSearch = this.inflightSearches.get(infoHash);
     if (inflightSearch !== undefined) return inflightSearch;
 
+    const find = (torrent: Torrent) => {
+      const torrentFile = findTorrentFile(content, torrent);
+      return torrentFile !== undefined
+        ? {
+            ...torrentMeta,
+            ...torrentFile,
+            infoHash,
+            announce: torrent.announce,
+          }
+        : null;
+    };
+
+    const cacheKey = `bay.torrent.${infoHash}`;
+
+    try {
+      let torrent = await this.cache.get(cacheKey);
+      if (torrent !== null) return find(torrent);
+    } catch (error: any) {
+      console.warn(`Failed to query cached torrent: ${error.message}`);
+    }
+
     inflightSearch = new Promise((resolve, _) => {
       const cleanup = () => {
         this.webtorrent.remove(magnetURI, { destroyStore: true }).catch();
@@ -263,17 +290,25 @@ class Bay {
       const findAndResolve = (torrent: Torrent) => {
         clearTimeout(timeout);
 
-        const torrentFile = findTorrentFile(content, torrent);
-        const torrentFileInfo =
-          torrentFile !== undefined
-            ? {
-                ...torrentMeta,
-                ...torrentFile,
-                infoHash: torrent.infoHash,
-                announce: torrent.announce,
-              }
-            : null;
-        resolve(torrentFileInfo);
+        this.cache
+          .set(
+            cacheKey,
+            {
+              announce: torrent.announce,
+              files: torrent.files.map((file) => {
+                return {
+                  name: file.name,
+                  length: file.length,
+                };
+              }),
+            },
+            this.ttlPerTorrent,
+          )
+          .catch((error: Error) => {
+            console.warn(`Failed to cache torrent: ${error.message}`);
+          });
+
+        resolve(find(torrent));
       };
 
       let torrent = this.webtorrent.torrents.find(
@@ -348,39 +383,12 @@ class Bay {
             if (inspectedTorrents.has(infoHash)) return;
             inspectedTorrents.add(infoHash);
 
-            const cacheKey = `bay.torrent.${infoHash}`;
-
-            let torrentFileInfo: TorrentFileInfo | "" | null = null;
-
-            try {
-              torrentFileInfo = await this.cache.get(cacheKey);
-              if (torrentFileInfo !== null) {
-                if (torrentFileInfo !== "") found.push(torrentFileInfo);
-
-                return;
-              }
-            } catch (error: any) {
-              console.warn(`Failed to query cached torrent: ${error.message}`);
-            }
-
-            torrentFileInfo = await this.lookupTorrent(
+            const torrentFileInfo = await this.lookupTorrent(
               magnetURI,
               infoHash,
               parameters.content,
               torrentMeta,
             );
-            // NOTE: nullable results are cached as well to speedup search
-            try {
-              if (torrentFileInfo === null) await this.cache.set(cacheKey, "");
-              else
-                await this.cache.set(
-                  cacheKey,
-                  torrentFileInfo,
-                  this.ttlPerMatchedTorrent,
-                );
-            } catch (error: any) {
-              console.warn(`Failed to cache torrent: ${error.message}`);
-            }
             if (torrentFileInfo === null) return;
 
             found.push(torrentFileInfo);

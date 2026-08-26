@@ -53,7 +53,7 @@ const bay = createTorrentBay({
   searhLimitPerProvider: env.BAY_PROVIDER_SEARCH_LIMIT,
   searchTimeout: env.BAY_SEARCH_TIMEOUT_MS,
   cache,
-  ttlPerMatchedTorrent: env.BAY_CACHE_TTL_S,
+  ttlPerTorrent: env.BAY_CACHE_TTL_S,
 });
 
 const addonInterface = buildAddonInterface(cinemata, bay);

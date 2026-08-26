@@ -141,6 +141,9 @@ function streamHandler(
         name: quality,
         description: stream.name,
         sources: stream.announce,
+        behaviorHints: {
+          videoSize: stream.size,
+        },
       };
     });
 

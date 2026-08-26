@@ -29,6 +29,7 @@ describe("addon", () => {
           infoHash: "89599BF4DC369A3A8ECA26411C5CCF922D78B486",
           quality: StreamQuality.Q1080p,
           announce: ["udp://tracker.opentrackr.org:1337"],
+          size: 2426656522,
         },
       ];
       const bay: TorrentBay = {
@@ -52,6 +53,9 @@ describe("addon", () => {
             infoHash: "89599BF4DC369A3A8ECA26411C5CCF922D78B486",
             name: "1080p",
             sources: ["udp://tracker.opentrackr.org:1337"],
+            behaviorHints: {
+              videoSize: 2426656522,
+            },
           },
         ],
       });
@@ -88,6 +92,7 @@ describe("addon", () => {
           infoHash: "718CF91776E36449AFB49F4EFC4C2C2EEBC59CE1",
           quality: StreamQuality.Q1080p,
           announce: ["udp://tracker.opentrackr.org:1337"],
+          size: 904501658,
         },
       ];
       const bay: TorrentBay = {
@@ -114,6 +119,9 @@ describe("addon", () => {
             infoHash: "718CF91776E36449AFB49F4EFC4C2C2EEBC59CE1",
             name: "1080p",
             sources: ["udp://tracker.opentrackr.org:1337"],
+            behaviorHints: {
+              videoSize: 904501658,
+            },
           },
         ],
       });
