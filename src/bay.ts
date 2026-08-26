@@ -107,14 +107,18 @@ function parseCategory(provider: TorrentProvider): string {
 }
 
 function buildTorrentTitleFilter(content: Content): (title: string) => boolean {
-  const nonAlphaRegex = /[^a-z]/i;
+  const nonAlphaRegex = /[^a-z0-9]/i;
   const nameChars = [];
+  let pcharAlpha = true;
   for (let i = 0; i < content.name.length; i++) {
     const cchar = content.name.charAt(i);
     if (nonAlphaRegex.test(cchar)) {
-      const pchar = content.name.charAt(i - 1);
-      if (!nonAlphaRegex.test(pchar)) nameChars.push("[^a-z]*");
-    } else nameChars.push(cchar);
+      if (pcharAlpha) nameChars.push("[^a-z]*");
+      pcharAlpha = false;
+    } else {
+      nameChars.push(cchar);
+      pcharAlpha = true;
+    }
   }
   const name = nameChars.join("");
 
