@@ -270,8 +270,8 @@ class Bay {
     const cacheKey = `bay.torrent.${infoHash}`;
 
     try {
-      let torrent = await this.cache.get(cacheKey);
-      if (torrent !== null) return find(torrent);
+      let torrent: Torrent | 0 | null = await this.cache.get(cacheKey);
+      if (torrent !== null) return torrent !== 0 ? find(torrent) : null;
     } catch (error: any) {
       console.warn(`Failed to query cached torrent: ${error.message}`);
     }
@@ -282,6 +282,10 @@ class Bay {
       };
 
       const timeout = setTimeout(() => {
+        this.cache.set(cacheKey, 0).catch((error: Error) => {
+          console.warn(`Failed to cache timed out torrent: ${error.message}`);
+        });
+
         resolve(null);
 
         cleanup();
@@ -305,7 +309,7 @@ class Bay {
             this.ttlPerTorrent,
           )
           .catch((error: Error) => {
-            console.warn(`Failed to cache torrent: ${error.message}`);
+            console.warn(`Failed to cache valid torrent: ${error.message}`);
           });
 
         resolve(find(torrent));
@@ -342,34 +346,32 @@ class Bay {
 
     const desiredTorrent = buildTorrentMetaFilter(parameters.content);
     const inspectedTorrents = new Set();
-    const searchesPerProvider = this.selectProviders(parameters).map(
-      async ({ provider, formattedCategory }) => {
-        const queried: TorrentMeta[][] = [];
-
-        const searches = parameters.queries.map(async (query) => {
-          let torrentsMeta: TorrentMeta[];
-
-          try {
-            torrentsMeta = await provider.search(
-              query,
-              formattedCategory,
-              this.searhLimit,
-            );
-          } catch (error: any) {
-            console.warn(
-              `Failed to query provider ${provider.name} with '${query}': ${error.message}`,
-            );
-
-            return;
-          }
-
-          if (torrentsMeta.length > 0) queried.push(torrentsMeta);
+    const searchesPerProvider = this.selectProviders(parameters)
+      .flatMap((provider) => {
+        return parameters.queries.map((query) => {
+          return { ...provider, query };
         });
-        await Promise.all(searches);
+      })
+      .map(async ({ provider, formattedCategory, query }) => {
+        let torrentsMeta: TorrentMeta[];
+
+        try {
+          torrentsMeta = await provider.search(
+            query,
+            formattedCategory,
+            this.searhLimit,
+          );
+        } catch (error: any) {
+          console.warn(
+            `Failed to query provider ${provider.name} with '${query}': ${error.message}`,
+          );
+
+          return [];
+        }
 
         const found: TorrentFileInfo[] = [];
 
-        const lookups = queried
+        const lookups = torrentsMeta
           .flat()
           .slice(0, this.searhLimit)
           .filter(desiredTorrent)
@@ -396,8 +398,7 @@ class Bay {
         await Promise.all(lookups);
 
         return found;
-      },
-    );
+      });
     const torrentFilesInfo = await Promise.all(searchesPerProvider);
 
     return sortTorrentFilesInfo(parameters.sortBy, torrentFilesInfo.flat());
