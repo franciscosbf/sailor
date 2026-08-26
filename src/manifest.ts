@@ -3,7 +3,7 @@ import { type ManifestSchema } from "@stremio-addon/zod";
 export const manifest: ManifestSchema = {
   id: "torrents.sailor",
   version: "0.0.1",
-  name: "Sailor Addon",
+  name: "Sailor",
   description:
     "Torrents bay navigator. Supported providers: TorrentProject, The Pirate Bay and Limetorrents.",
   catalogs: [],
