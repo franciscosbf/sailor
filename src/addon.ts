@@ -8,12 +8,13 @@ import {
 import { AddonBuilder } from "@stremio-addon/zod";
 import {
   ContentType,
-  Provider,
   StreamQuality,
   SortBy,
   type Content,
   type Stream,
   type TorrentBay,
+  PROVIDER_NAMES,
+  type ProviderName,
 } from "./bay.js";
 import {
   type CinemataSearcher,
@@ -36,13 +37,13 @@ function streamHandler(
   return async (args) => {
     if (args.type !== "movie" && args.type !== "series") return empty;
 
-    let providers = Object.keys(Provider) as Provider[];
+    let providers = PROVIDER_NAMES as ProviderName[];
     let sortBy = SortBy.QualityThenSeeders;
     const config = args.config;
     if (config !== undefined) {
       let selectedProviders = providers.filter((provider) =>
         config.hasOwnProperty(provider),
-      ) as Provider[];
+      ) as ProviderName[];
       if (selectedProviders.length > 0) providers = selectedProviders;
 
       switch (config.sort) {

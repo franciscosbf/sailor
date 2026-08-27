@@ -29,12 +29,19 @@ export interface SeriesContent {
 
 export type Content = MovieContent | SeriesContent;
 
-export enum Provider {
-  TorrentProject = "TorrentProject",
-  ThePirateBay = "ThePirateBay",
-  LimeTorrents = "LimeTorrents",
-}
-const PROVIDER_NAMES = new Set(Object.keys(Provider));
+const PROVIDER_NAMES_MAPPING = {
+  TorrentProject: "TorrentProject",
+  ThePirateBay: "ThePirateBay",
+  LimeTorrents: "Limetorrents",
+} as const;
+
+export type ProviderName = keyof typeof PROVIDER_NAMES_MAPPING;
+
+type ApiProviderName = (typeof PROVIDER_NAMES_MAPPING)[ProviderName];
+
+export const PROVIDER_NAMES: Readonly<ProviderName[]> = Object.keys(
+  PROVIDER_NAMES_MAPPING,
+) as ProviderName[];
 
 export enum SortBy {
   Seeders,
@@ -46,7 +53,7 @@ export enum SortBy {
 export interface SearchParameters {
   queries: string[];
   content: Content;
-  providers: Provider[];
+  providers: ProviderName[];
   sortBy: SortBy;
 }
 
@@ -94,12 +101,22 @@ function decodeQuality(raw: string): StreamQuality | undefined {
   }
 }
 
-function parseCategory(provider: TorrentProvider): string {
+function parseCategory(provider: TorrentProvider, type: ContentType): string {
   let category = "All";
 
-  switch (provider.name as Provider) {
-    case Provider.ThePirateBay:
+  switch (provider.name) {
+    case PROVIDER_NAMES_MAPPING.ThePirateBay:
       category = "Video";
+      break;
+    case PROVIDER_NAMES_MAPPING.LimeTorrents:
+      switch (type) {
+        case ContentType.Movie:
+          category = "Movies";
+          break;
+        case ContentType.Series:
+          category = "TV";
+          break;
+      }
       break;
   }
 
@@ -220,7 +237,7 @@ export interface BayOptions {
 }
 
 class Bay {
-  private providers: Map<Provider, TorrentProvider>;
+  private providers: Map<ApiProviderName, TorrentProvider>;
   private webtorrent: WebTorrent.Instance;
   private inflightSearches: Map<string, Promise<TorrentFileInfo | null>>;
   private searhLimit: number;
@@ -229,11 +246,14 @@ class Bay {
   private ttlPerTorrent: number;
 
   constructor(options: BayOptions) {
+    const providerApiNames = new Set(Object.values(PROVIDER_NAMES_MAPPING));
     this.providers = new Map(
       TorrentSearchApi.providers
-        .filter((provider) => PROVIDER_NAMES.has(provider.name))
+        .filter((provider) =>
+          providerApiNames.has(provider.name as ApiProviderName),
+        )
         .map((provider) => {
-          return [provider.name as Provider, provider];
+          return [provider.name as ApiProviderName, provider];
         }),
     );
     // NOTE: latest @types/webtorrent is outdated, utPex and seedOutgoingConnections
@@ -259,10 +279,10 @@ class Bay {
     parameters: SearchParameters,
   ): { provider: TorrentProvider; category: string; query: string }[] {
     return parameters.providers
-      .map((provider) => this.providers.get(provider))
+      .map((provider) => this.providers.get(PROVIDER_NAMES_MAPPING[provider]))
       .filter((provider) => provider !== undefined)
       .flatMap((provider) => {
-        const category = parseCategory(provider);
+        const category = parseCategory(provider, parameters.content.type);
 
         return parameters.queries.map((query) => {
           return { provider, category, query };
