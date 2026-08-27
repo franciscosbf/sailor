@@ -136,6 +136,7 @@ function streamHandler(
       }
       const name = `${manifest.name}\n${quality}`;
       const sources = stream.announce.map((announce) => `tracker:${announce}`);
+      const bingeGroup = `${manifest.name}-${quality}`;
 
       return {
         infoHash: stream.infoHash,
@@ -146,6 +147,7 @@ function streamHandler(
         behaviorHints: {
           videoSize: stream.size,
           filename: stream.name,
+          bingeGroup,
         },
       };
     });
