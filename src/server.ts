@@ -44,7 +44,8 @@ const cache =
 try {
   await cache.connect();
 } catch (error: any) {
-  console.log(`Failed to connect to cache: ${error.message}`);
+  const reason = error instanceof AggregateError ? error.errors[0] : error;
+  console.error(`Failed to connect to cache: ${reason.message}`);
 
   process.exit(1);
 }

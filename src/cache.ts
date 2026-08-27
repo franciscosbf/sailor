@@ -28,11 +28,6 @@ class CachePool {
       url: options.url,
       disableOfflineQueue: true,
     });
-    pool.on("error", (error: Error) => {
-      console.error(`Unexpected cache error: ${error.message}`);
-
-      this.destroy();
-    });
 
     this.pool = pool;
     this.destroyed = false;
