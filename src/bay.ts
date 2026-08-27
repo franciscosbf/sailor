@@ -243,7 +243,7 @@ class Bay {
   private searhLimit: number;
   private searchTimeout: number;
   private cache: Cache;
-  private ttlPerTorrent: number;
+  private ttlPerValidTorrent: number;
 
   constructor(options: BayOptions) {
     const providerApiNames = new Set(Object.values(PROVIDER_NAMES_MAPPING));
@@ -272,7 +272,7 @@ class Bay {
     this.searhLimit = options.searhLimitPerProvider;
     this.searchTimeout = options.searchTimeout;
     this.cache = options.cache;
-    this.ttlPerTorrent = options.ttlPerTorrent;
+    this.ttlPerValidTorrent = options.ttlPerTorrent;
   }
 
   private selectProviders(
@@ -316,7 +316,7 @@ class Bay {
     try {
       let torrent: Torrent | 0 | null = await this.cache.get(
         cacheKey,
-        this.ttlPerTorrent,
+        this.ttlPerValidTorrent,
       );
       if (torrent !== null) return torrent !== 0 ? find(torrent) : null;
     } catch (error: any) {
@@ -353,7 +353,7 @@ class Bay {
                 };
               }),
             },
-            this.ttlPerTorrent,
+            this.ttlPerValidTorrent,
           )
           .catch((error: Error) => {
             console.warn(`Failed to cache valid torrent: ${error.message}`);
