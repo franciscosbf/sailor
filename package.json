@@ -23,6 +23,7 @@
     "@stremio-addon/node-express": "^1.0.0",
     "@stremio-addon/sdk": "^1.0.0",
     "@stremio-addon/zod": "^1.0.0",
+    "@tsmx/human-readable": "^2.0.4",
     "envalid": "^8.2.0",
     "express": "^5.2.1",
     "magnet-uri": "^7.0.7",

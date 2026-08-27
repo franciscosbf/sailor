@@ -23,6 +23,7 @@ import {
 } from "./cinemata.js";
 import type { StreamSchema } from "@stremio-addon/zod";
 import { toS00Format } from "./util.js";
+import { fromBytes } from "@tsmx/human-readable";
 
 function streamHandler(
   cinemata: CinemataSearcher,
@@ -134,15 +135,15 @@ function streamHandler(
           quality = "4k";
           break;
       }
-      const name = `${manifest.name}\n${quality}`;
+      const description = `${stream.name}\n📺 ${quality}\n👤 ${stream.seeds} 💾 ${fromBytes(stream.size, {})}`;
       const sources = stream.announce.map((announce) => `tracker:${announce}`);
       const bingeGroup = `${manifest.name}-${quality}`;
 
       return {
         infoHash: stream.infoHash,
         fileIdx: stream.fileIdx,
-        name,
-        description: stream.name,
+        name: manifest.name,
+        description,
         sources,
         behaviorHints: {
           videoSize: stream.size,

@@ -82,6 +82,7 @@ export interface Stream {
   quality: StreamQuality;
   announce: string[];
   size: number;
+  seeds: number;
 }
 
 interface Torrent {

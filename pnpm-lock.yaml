@@ -26,6 +26,9 @@ importers:
       '@stremio-addon/zod':
         specifier: ^1.0.0
         version: 1.0.0(zod@4.4.3)
+      '@tsmx/human-readable':
+        specifier: ^2.0.4
+        version: 2.0.4
       envalid:
         specifier: ^8.2.0
         version: 8.2.0
@@ -224,6 +227,10 @@ packages:
   '@tootallnate/once@1.1.2':
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
     engines: {node: '>= 6'}
+
+  '@tsmx/human-readable@2.0.4':
+    resolution: {integrity: sha512-RDGX6aDZYV7JI6GfPRujWXHoYIzqPXqiXJtHXH5a8Zy/tH+vPtxLhbIU90YlM865Dv7cBrTItF3kutST6bVdrA==}
+    engines: {node: '>=14.0.0', npm: '>=6.0.0'}
 
   '@types/bittorrent-protocol@3.1.7':
     resolution: {integrity: sha512-RGOjJndPEuMDP7563SE+s7Yu3ctibhPizVKcFaDYiv6hmckNgdSXMqhABhb48wn2XWIRnj9nF66ryLTb2VuKZQ==}
@@ -2275,6 +2282,8 @@ snapshots:
       uint8-util: 2.3.2
 
   '@tootallnate/once@1.1.2': {}
+
+  '@tsmx/human-readable@2.0.4': {}
 
   '@types/bittorrent-protocol@3.1.7':
     dependencies:
