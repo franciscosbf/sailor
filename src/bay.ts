@@ -203,30 +203,52 @@ function findTorrentFile(
   }
 }
 
-function sortBySeeders(torrentFileInfo: TorrentFileInfo[]) {
-  return torrentFileInfo.sort((tfi1, tfi2) => tfi2.seeds - tfi1.seeds);
+function sortBySeeders(tfi1: TorrentFileInfo, tfi2: TorrentFileInfo): number {
+  return tfi2.seeds - tfi1.seeds;
 }
 
-function sortByQuality(torrentsInfo: TorrentFileInfo[]) {
-  return (torrentsInfo = torrentsInfo.sort(
-    (tfi1, tfi2) => tfi2.quality - tfi1.quality,
-  ));
+function sortByQuality(tfi1: TorrentFileInfo, tfi2: TorrentFileInfo): number {
+  return tfi2.quality - tfi1.quality;
+}
+
+function sortBySeedersThenQuality(
+  t1: TorrentFileInfo,
+  t2: TorrentFileInfo,
+): number {
+  const diff = sortBySeeders(t1, t2);
+  return diff === 0 ? sortByQuality(t1, t2) : diff;
+}
+
+function sortByQualityThenSeeders(
+  t1: TorrentFileInfo,
+  t2: TorrentFileInfo,
+): number {
+  const diff = sortByQuality(t1, t2);
+  return diff === 0 ? sortBySeeders(t1, t2) : diff;
 }
 
 function sortTorrentFilesInfo(
   sortBy: SortBy,
   torrentFilesInfo: TorrentFileInfo[],
 ): TorrentFileInfo[] {
+  let sorter: (t1: TorrentFileInfo, t2: TorrentFileInfo) => number;
+
   switch (sortBy) {
     case SortBy.Seeders:
-      return sortBySeeders(torrentFilesInfo);
+      sorter = sortBySeeders;
+      break;
     case SortBy.Quality:
-      return sortByQuality(torrentFilesInfo);
+      sorter = sortByQuality;
+      break;
     case SortBy.SeedersThenQuality:
-      return sortByQuality(sortBySeeders(torrentFilesInfo));
+      sorter = sortBySeedersThenQuality;
+      break;
     case SortBy.QualityThenSeeders:
-      return sortBySeeders(sortByQuality(torrentFilesInfo));
+      sorter = sortByQualityThenSeeders;
+      break;
   }
+
+  return torrentFilesInfo.sort(sorter);
 }
 
 export interface BayOptions {
