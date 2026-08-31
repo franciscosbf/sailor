@@ -18,36 +18,4 @@ export const manifest: ManifestSchema = {
   behaviorHints: {
     configurable: true,
   },
-  config: [
-    {
-      key: "sort",
-      type: "select",
-      title: "Sort torrents by",
-      options: [
-        "Seeders",
-        "Quality",
-        "QualityThenSeeders",
-        "SeedersThenQuality",
-      ],
-      default: "QualityThenSeeders",
-    },
-    {
-      key: "TorrentProject",
-      type: "checkbox",
-      title: "TorrentProject",
-      default: "checked",
-    },
-    {
-      key: "ThePirateBay",
-      type: "checkbox",
-      title: "The Pirate Bay",
-      default: "checked",
-    },
-    {
-      key: "LimeTorrents",
-      type: "checkbox",
-      title: "LimeTorrents",
-      default: "checked",
-    },
-  ],
 };
