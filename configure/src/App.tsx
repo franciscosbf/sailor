@@ -203,6 +203,18 @@ function SortingOption({
   );
 }
 
+function Installation({ link }: { link: string }) {
+  return (
+    <div className="flex justify-center">
+      <a href={link}>
+        <button className="btn btn-primary btn-sm hover:animate-tada hover:outline-2 hover:outline-offset-2">
+          Install
+        </button>
+      </a>
+    </div>
+  );
+}
+
 function Configuration() {
   const [options, setOptions] = useState({
     providers: new Set(providerNames),
@@ -233,13 +245,7 @@ function Configuration() {
           <div className="divider"></div>
           <SortingOption sorting={options.sorting} onChange={handleOption} />
           <div className="divider"></div>
-          <div className="flex justify-center">
-            <a href={link}>
-              <button className="btn btn-primary btn-sm hover:animate-tada hover:outline-2 hover:outline-offset-2">
-                Install
-              </button>
-            </a>
-          </div>
+          <Installation link={link} />
         </div>
       </div>
     </div>
