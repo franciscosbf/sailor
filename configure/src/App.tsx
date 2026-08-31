@@ -88,7 +88,7 @@ function ProvidersOption({
       <div className="grid grid-rows-1 gap-6">
         <div className="place-self-center">
           <div className="flex gap-1">
-            <p className="text-2xl font-bold pl-6">Torrent Providers</p>
+            <p className="text-2xl font-bold pl-5">Torrent Providers</p>
             <div className="size-5 tooltip tooltip-end lg:tooltip-center tooltip-top lg:tooltip-right tooltip-primary tooltip-no-arrow">
               <div className="tooltip-content border border-2 font-normal translate-x-6 lg:translate-x-0">
                 At least one must be selected. If you deselect all, they will be
@@ -157,7 +157,7 @@ function SortingOption({
       <div className="grid grid-rows-1 gap-6">
         <div className="place-self-center">
           <div className="flex gap-1">
-            <p className="text-2xl font-bold pl-6">Sorting Strategy</p>
+            <p className="text-2xl font-bold pl-5">Sorting Strategy</p>
             <div className="size-5 tooltip tooltip-end lg:tooltip-center tooltip-top lg:tooltip-right tooltip-primary tooltip-no-arrow">
               <div className="tooltip-content border border-2 font-normal translate-x-6 lg:translate-x-0">
                 Listed streams will be sorted according to the selected criteria
