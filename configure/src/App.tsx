@@ -255,12 +255,8 @@ function Configuration() {
 function App() {
   return (
     <>
-      <div>
-        <Navbar />
-      </div>
-      <div>
-        <Configuration />
-      </div>
+      <Navbar />
+      <Configuration />
     </>
   );
 }
