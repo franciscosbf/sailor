@@ -1,7 +1,6 @@
 {
   "name": "stremio-addon-sailor",
   "version": "1.0.0",
-  "description": "",
   "main": "dist/server.js",
   "private": true,
   "scripts": {
@@ -10,10 +9,6 @@
     "test": "vitest",
     "start": "node dist/server.js"
   },
-  "keywords": [
-    "stremio",
-    "addon"
-  ],
   "license": "MIT",
   "type": "module",
   "dependencies": {
