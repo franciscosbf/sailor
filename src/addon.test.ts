@@ -6,7 +6,7 @@ import {
 } from "./cinemata.js";
 import {
   ContentType,
-  Provider,
+  PROVIDER_NAMES,
   SortBy,
   StreamQuality,
   TorrentBay,
@@ -30,6 +30,7 @@ describe("addon", () => {
           quality: StreamQuality.Q1080p,
           announce: ["udp://tracker.opentrackr.org:1337"],
           size: 2426656522,
+          seeds: 3,
         },
       ];
       const bay: TorrentBay = {
@@ -48,12 +49,14 @@ describe("addon", () => {
       expect(streamSchemas).toEqual({
         streams: [
           {
-            description: "Interstellar (2014) (2014) 1080p BrRip x264 - YIFY",
+            description:
+              "Interstellar (2014) (2014) 1080p BrRip x264 - YIFY\n📺 1080p\n👤 3 💾 2.43 GB",
             fileIdx: 0,
             infoHash: "89599BF4DC369A3A8ECA26411C5CCF922D78B486",
-            name: "Sailor\n1080p",
+            name: "Sailor",
             sources: ["tracker:udp://tracker.opentrackr.org:1337"],
             behaviorHints: {
+              bingeGroup: "Sailor-1080p",
               videoSize: 2426656522,
               filename: "Interstellar (2014) (2014) 1080p BrRip x264 - YIFY",
             },
@@ -69,11 +72,7 @@ describe("addon", () => {
       expect(bay.search).toHaveBeenCalledExactlyOnceWith({
         queries: ["Interstellar 2014"],
         content: { type: ContentType.Movie, name: "Interstellar" },
-        providers: [
-          Provider.TorrentProject,
-          Provider.ThePirateBay,
-          Provider.LimeTorrents,
-        ],
+        providers: PROVIDER_NAMES,
         sortBy: SortBy.QualityThenSeeders,
       });
 
@@ -98,6 +97,7 @@ describe("addon", () => {
           quality: StreamQuality.Q1080p,
           announce: ["udp://tracker.opentrackr.org:1337"],
           size: 904501658,
+          seeds: 24,
         },
       ];
       const bay: TorrentBay = {
@@ -123,12 +123,13 @@ describe("addon", () => {
         streams: [
           {
             description:
-              "Mr.Robot.SEASON.01.S01.COMPLETE.1080p.10bit.BluRay.6CH.x265.HEVC",
+              "Mr.Robot.SEASON.01.S01.COMPLETE.1080p.10bit.BluRay.6CH.x265.HEVC\n📺 1080p\n👤 24 💾 904.50 MB",
             fileIdx: 0,
             infoHash: "718CF91776E36449AFB49F4EFC4C2C2EEBC59CE1",
-            name: "Sailor\n1080p",
+            name: "Sailor",
             sources: ["tracker:udp://tracker.opentrackr.org:1337"],
             behaviorHints: {
+              bingeGroup: "Sailor-1080p",
               videoSize: 904501658,
               filename:
                 "Mr.Robot.SEASON.01.S01.COMPLETE.1080p.10bit.BluRay.6CH.x265.HEVC",
@@ -151,7 +152,7 @@ describe("addon", () => {
           episode: "1",
           seasons: "4",
         },
-        providers: [Provider.TorrentProject, Provider.LimeTorrents],
+        providers: ["TorrentProject", "LimeTorrents"],
         sortBy: SortBy.Seeders,
       });
 
