@@ -223,13 +223,13 @@ function Configuration() {
 
   const [link, setLink] = useState(buildLinkFromOptions(options));
 
-  function handleOption(updated: UpdatedOption) {
+  const handleOption = (updated: UpdatedOption) => {
     const newOptions = { ...options, [updated.name]: updated.value };
     setOptions(newOptions);
 
     const newLink = buildLinkFromOptions(newOptions);
     setLink(newLink);
-  }
+  };
 
   return (
     <div className="h-screen flex items-center justify-center">
