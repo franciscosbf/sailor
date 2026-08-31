@@ -1,21 +1,46 @@
 # sailor
 
-sailor is a Stremio Addon for searching streams, which supports two torrent engines: The Pirate Bay and TorrentProject.
+sailor is a Stremio Addon for searching streams, which supports 3 torrent engines: LimeTorrents, The Pirate Bay and TorrentProject.
 
 #### Requirements
 
 - [pnpm](https://pnpm.io/)
 
-```
-# install dependencies
-pnpm i
-```
-
 #### Available Commands
 
+##### Addon Configuration Web Page (configure/)
+
 ```shell
+# install dependencies
+pnpm install
+
+# start dev server with live updates
+pnpm run dev
+
 # remove existing build (dist/ folder)
 pnpm run clean
+
+# build web page
+pnpm run build
+
+# start dev server with built web page at dist/
+pnpm run preview
+
+# run ESlint
+pnpm run lint
+```
+
+##### Addon Server
+
+```shell
+# install dependencies
+pnpm install
+
+# remove existing build (dist/ folder)
+pnpm run clean
+
+# test addon
+pnpm run test
 
 # build server
 pnpm run build

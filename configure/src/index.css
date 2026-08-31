@@ -1,0 +1,20 @@
+@import "tailwindcss";
+@import "tailwind-animations";
+
+@plugin "daisyui" {
+  themes:
+    retro,
+    coffee --default;
+}
+
+@plugin "daisyui/theme" {
+  name: "retro";
+  --color-primary: var(--color-accent);
+  --color-primary-content: var(--color-success-content);
+}
+
+@media (hover: hover) {
+  :root:has(.theme-controller[value="coffee"]:checked) .btn:hover {
+    filter: brightness(1.25) !important;
+  }
+}

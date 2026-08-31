@@ -1,0 +1,3 @@
+.tooltip-no-arrow::after {
+  display: none !important;
+}

@@ -1,12 +1,16 @@
 import { buildAddonInterface } from "./addon.js";
 import { env } from "./flags.js";
-import { publishToCentral, landingTemplate } from "@stremio-addon/compat";
+import {
+  publishToCentral,
+  //, landingTemplate
+} from "@stremio-addon/compat";
 import { getRouter } from "@stremio-addon/node-express";
 import express from "express";
 import { type AddressInfo } from "net";
 import { createTorrentBay } from "./bay.js";
 import { createCinemataSearcher } from "./cinemata.js";
 import { createCache } from "./cache.js";
+import { landingTemplatePaths } from "./landing-template.js";
 
 class DummyCache {
   constructor() {}
@@ -61,15 +65,22 @@ const addonInterface = buildAddonInterface(cinemata, bay);
 const app = express();
 const port = env.ADDON_PORT;
 const cacheMaxAge = env.ADDON_CACHE_MAX_AGE_S;
-const landingHTML = landingTemplate(addonInterface.manifest);
+// const landingHTML = landingTemplate(addonInterface.manifest);
 let shuttingDown = false;
 
 app.use("/", getRouter(addonInterface, { cacheMaxAge }));
 app.get("/", (_, res) => {
   res.redirect("/configure");
 });
+app.use(
+  "/configure",
+  express.static(landingTemplatePaths.static, {
+    index: false,
+    redirect: false,
+  }),
+);
 app.get("/configure", (_, res) => {
-  res.setHeader("Content-Type", "text/html").end(landingHTML);
+  res.sendFile(landingTemplatePaths.index);
 });
 app.get("/health", (_, res) => {
   if (shuttingDown) res.status(503).send("no healthy");
