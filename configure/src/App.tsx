@@ -34,8 +34,9 @@ function buildLinkFromOptions(options: Options): string {
     providers: [...options.providers],
     sorting: options.sorting,
   };
+  const encoded = encodeURIComponent(JSON.stringify(selected));
 
-  return `stremio:${window.location.host}/${encodeURIComponent(JSON.stringify(selected))}/manifest.json`;
+  return `stremio:${window.location.host}/${encoded}/manifest.json`;
 }
 
 function Navbar() {
