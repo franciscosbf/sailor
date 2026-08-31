@@ -42,10 +42,13 @@ function streamHandler(
     let sortBy = SortBy.QualityThenSeeders;
     const config = args.config;
     if (config !== undefined) {
-      let selectedProviders = providers.filter((provider) =>
-        config.hasOwnProperty(provider),
-      ) as ProviderName[];
-      if (selectedProviders.length > 0) providers = selectedProviders;
+      if (Array.isArray(config.providers)) {
+        const validProviders = new Set(...providers);
+        let selectedProviders = config.providers.filter((provider) =>
+          validProviders.has(provider),
+        ) as ProviderName[];
+        if (selectedProviders.length > 0) providers = selectedProviders;
+      }
 
       switch (config.sort) {
         case "Seeders":

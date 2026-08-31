@@ -114,8 +114,7 @@ describe("addon", () => {
         undefined,
         {
           sort: "Seeders",
-          TorrentProject: "on",
-          LimeTorrents: "on",
+          providers: ["TorrentProject", "LimeTorrents"],
         },
       );
 
@@ -152,7 +151,7 @@ describe("addon", () => {
           episode: "1",
           seasons: "4",
         },
-        providers: ["TorrentProject", "LimeTorrents"],
+        providers: ["TorrentProject", "ThePirateBay", "LimeTorrents"],
         sortBy: SortBy.Seeders,
       });
 
