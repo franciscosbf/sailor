@@ -1,6 +1,6 @@
-# sailor
+# Sailor
 
-sailor is a Stremio Addon for searching streams, which supports 3 torrent engines: LimeTorrents, The Pirate Bay and TorrentProject.
+Sailor is a Stremio Addon for searching streams, which supports 3 torrent engines: LimeTorrents, The Pirate Bay and TorrentProject.
 
 #### Requirements
 
