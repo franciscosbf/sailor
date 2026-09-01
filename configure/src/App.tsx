@@ -27,6 +27,20 @@ type UpdatedOption =
   | { name: "providers"; value: Set<Provider> }
   | { name: "sorting"; value: SortingStrategy };
 
+interface ProvidersOptionProps {
+  providers: Set<Provider>;
+  onClick: (changed: UpdatedOption) => void;
+}
+
+interface SortingOptionProps {
+  sorting: SortingStrategy;
+  onChange: (changed: UpdatedOption) => void;
+}
+
+interface InstallationProps {
+  link: string;
+}
+
 const providerNames = Object.keys(Providers) as Provider[];
 
 function buildLinkFromOptions(options: Options): string {
@@ -77,13 +91,7 @@ function Navbar() {
   );
 }
 
-function ProvidersOption({
-  providers,
-  onClick,
-}: {
-  providers: Set<Provider>;
-  onClick: (changed: UpdatedOption) => void;
-}) {
+function ProvidersOption({ providers, onClick }: ProvidersOptionProps) {
   return (
     <div className="flex justify-center">
       <div className="grid grid-rows-1 gap-6">
@@ -146,13 +154,7 @@ function ProvidersOption({
   );
 }
 
-function SortingOption({
-  sorting,
-  onChange,
-}: {
-  sorting: SortingStrategy;
-  onChange: (changed: UpdatedOption) => void;
-}) {
+function SortingOption({ sorting, onChange }: SortingOptionProps) {
   return (
     <div className="flex justify-center">
       <div className="grid grid-rows-1 gap-6">
@@ -203,7 +205,7 @@ function SortingOption({
   );
 }
 
-function Installation({ link }: { link: string }) {
+function Installation({ link }: InstallationProps) {
   return (
     <div className="flex justify-center">
       <a href={link}>
